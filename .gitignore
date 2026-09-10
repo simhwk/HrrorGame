@@ -2,7 +2,6 @@
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
-/[Bb]uild/
 /[Bb]uilds/
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
@@ -41,6 +40,11 @@ crashlytics-build.properties
 
 # Gradle cache
 .gradle/
+
+# PPT generator (docs/)
+build/node_modules/
+build/*.pdf
+build/deck.pptx
 
 # OS
 .DS_Store
