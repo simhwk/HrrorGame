@@ -30,6 +30,7 @@ namespace CaveGame
         // 표식 단계를 갱신하고 그에 맞는 비주얼만 활성화
         public void SetStage(MarkerStage newStage) // 외부(MarkerSpawner)에서 단계 전환 시 호출
         {
+            Debug.Log(newStage);
             stage = newStage; // 내부 상태를 새 단계로 교체
             touchConfirmed = false; // 단계가 바뀌면 확인 상태 초기화(이전 단계에서 확인했던 기록은 무효)
 

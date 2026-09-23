@@ -51,3 +51,6 @@ build/deck.pptx
 Thumbs.db
 desktop.ini
 *.slnx
+
+# Local backups/exports (too large for repo)
+*.zip

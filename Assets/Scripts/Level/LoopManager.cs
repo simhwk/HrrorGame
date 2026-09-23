@@ -44,13 +44,8 @@ namespace CaveGame
                 // "-="는 구독 해제: 파괴된 이후에도 이벤트가 호출되면 에러가 나므로 반드시 짝을 맞춰 해제해야 함
         }
 
-        // 시작 시 현재 상태(단계/표식/사운드)를 한 번 적용
-        void Start() // 첫 프레임 직전에 한 번 호출
-        {
-            ApplyStage(GameManager.Instance.CurrentStage); // 현재 저장된 단계(기본 Tape)를 플레이어에 적용
-            markerSpawner.SetStage(GameManager.Instance.CurrentStage); // 표식들도 같은 단계로 맞춤
-            audioSequencer.PlayCueForLoop(GameManager.Instance.CurrentLoop); // 1루프에 맞는 공포 사운드 시작
-        }
+        // 시작 시 초기 상태 적용은 GameManager.Start의 LoopAdvanced 통지가 OnLoopAdvanced로 대신 처리한다
+        // (여기서 또 적용하면 1루프 사운드가 두 번 재생됨)
 
         // LoopEndTrigger로부터 호출되는, 루프 끝 지점 도달 처리
         public void OnLoopEndReached() // 플레이어가 루프 끝 콜라이더를 밟았을 때 LoopEndTrigger가 호출

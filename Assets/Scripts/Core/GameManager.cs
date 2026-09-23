@@ -8,6 +8,9 @@ using UnityEngine; // MonoBehaviour, SerializeField 등 유니티 기본 기능
 
 namespace CaveGame
 {
+    // 다른 스크립트들이 OnEnable에서 Instance를 구독하므로, 그보다 먼저 Awake가 돌아 Instance가 채워져 있어야 한다.
+    // 이게 없으면 씬 로드 순서에 따라 Instance가 null인 채로 구독이 조용히 스킵된다.
+    [DefaultExecutionOrder(-100)]
     public class GameManager : MonoBehaviour // MonoBehaviour를 상속해야 씬의 GameObject에 컴포넌트로 붙일 수 있음
     {
         public static GameManager Instance { get; private set; } // static: 클래스 전체에서 공유되는 단 하나의 값. 외부에서는 읽기만(get) 가능, 쓰기(set)는 이 클래스 내부에서만 가능(private set)
