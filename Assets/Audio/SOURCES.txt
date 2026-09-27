@@ -1,0 +1,63 @@
+Audio sources
+
+[CC0] Kenney.nl - Impact Sounds, RPG Audio (files prefixed kenney__)
+  https://kenney.nl/assets/impact-sounds  https://kenney.nl/assets/rpg-audio
+
+[CC0] OpenGameArt.org (file prefix = page slug)
+  https://opengameart.org/content/10-book-page-flips
+  https://opengameart.org/content/10-clicks-and-switches
+  https://opengameart.org/content/16-monster-growls
+  https://opengameart.org/content/4-atmospheric-ghostly-loops
+  https://opengameart.org/content/42-snow-and-gravel-footsteps
+  https://opengameart.org/content/7-eating-crunches
+  https://opengameart.org/content/75-cc0-breaking-falling-hit-sfx
+  https://opengameart.org/content/8-wet-squish-slurp-impacts
+  https://opengameart.org/content/80-cc0-creature-sfx
+  https://opengameart.org/content/80-cc0-creture-sfx-2
+  https://opengameart.org/content/ambient-horror
+  https://opengameart.org/content/big-and-small-item-fall-sounds2
+  https://opengameart.org/content/breaking-rock
+  https://opengameart.org/content/breathing-tired
+  https://opengameart.org/content/camera
+  https://opengameart.org/content/cave-in
+  https://opengameart.org/content/cc0-deep-monster-roar
+  https://opengameart.org/content/dark-ambiences
+  https://opengameart.org/content/deep-bone-crackbreak-sfx
+  https://opengameart.org/content/different-steps-on-wood-stone-leaves-gravel-and-mud
+  https://opengameart.org/content/electric-buzz
+  https://opengameart.org/content/evil-creature
+  https://opengameart.org/content/fantozzis-footsteps-grasssand-stone
+  https://opengameart.org/content/female-high-pitched-scream-sfx
+  https://opengameart.org/content/female-scream-1
+  https://opengameart.org/content/fleshy-bone-breaksnap-sfx
+  https://opengameart.org/content/frequency-static-sound-effects
+  https://opengameart.org/content/ghost-breath
+  https://opengameart.org/content/ghost-monster-voice-moaning-growling
+  https://opengameart.org/content/ghostmonster-sounds
+  https://opengameart.org/content/heartbeat-sounds
+  https://opengameart.org/content/horror-breathing
+  https://opengameart.org/content/loopable-dungeon-ambience
+  https://opengameart.org/content/low-rumbling
+  https://opengameart.org/content/ripping-into-meat
+  https://opengameart.org/content/rumbling-sound-effects
+  https://opengameart.org/content/static
+  https://opengameart.org/content/stone-rock-or-wood-moved-sound
+  https://opengameart.org/content/tape-recorder-opening-and-closing-sound-effects
+  https://opengameart.org/content/zipper
+
+[Free, royalty-free incl. commercial] BigSoundBank.com by Joseph Sardin (files prefixed bsb__, number = sound id)
+  https://bigsoundbank.com/licenses.html
+  Breathing/bsb__breath_*: cut/looped from #2195 (Man Breathing) and #1103 (Breathless Man);
+    breath_exhale_* = #2195 with exhale boosted ~+8dB (edited)
+
+[Pixabay Content License - free incl. commercial, no attribution] Pixabay.com (files prefixed pixabay__, number = pixabay id)
+  https://pixabay.com/service/license-summary/
+  Ambience/pixabay__cave_drip_far_*: single drops cut from
+    https://pixabay.com/sound-effects/film-special-effects-water-drops-26638/
+    https://pixabay.com/sound-effects/film-special-effects-water-drip-45622/
+    https://pixabay.com/sound-effects/film-special-effects-water-drop-89799/
+    (edited: denoise, 4.5kHz lowpass, direct -16dB + synthetic cave reverb RT60 2.2s -> distance ~30m+)
+  Ambience/pixabay__cave_wind_*: crossfade-looped, normalized to -30 LUFS
+    https://pixabay.com/sound-effects/horror-eerie-wind-478386/
+    https://pixabay.com/sound-effects/film-special-effects-cave-wind-10-76283/
+    https://pixabay.com/sound-effects/film-special-effects-wind-underground-sfx-522599/
