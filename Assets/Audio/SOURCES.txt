@@ -76,8 +76,28 @@ Rubbing Hands — BigSoundBank (CC0), Joseph SARDIN, https://bigsoundbank.com/ru
     100Hz HP, compressed 4:1, light cave echo, +10dB into limiter (edited) — 4루프 뒤에서 누가 돌을 찬 기척
   Breathing/gasp_short.wav: BigSoundBank #1103 (Breathless Man) 0.85~1.27s, 1.25x tempo, 250Hz HP, fades (edited) — 4루프 뒤 기척에 흠칫하는 숨
 
-# 4루프 등 뒤 기척 (Props/Fabric/rope_slide_1~4.wav, FollowerMimic에서 pitch 0.72~0.85) — 2026-09-29. 줄 소리로는 부적합 판정 → 짐승이 몸을 끄는 소리로 전용
+# (현재 미사용) Props/Fabric/rope_slide_1~4.wav — 2026-09-29. 줄 소리·4루프 기척 모두 부적합 판정 ("무스 같다")
 Sliding rope #1, #2, #4, #6 — BigSoundBank (CC0), Joseph SARDIN
   https://bigsoundbank.com/sliding-rope-1-s1818.html  (and s1819, s1821, s1823)
   originals: Props/Source/bsb__sliding_rope_{1_1818,2_1819,4_1821,6_1823}.ogg
   Processed: 120Hz HP + 4kHz LP, 0.7~0.85s cuts with slow fade-in (0.05~0.2s) and 0.3s fade-out, -20dB RMS.
+
+# 늑대·엘크 원본 (Creature/Source/nps__*.mp3) — 2026-09-29, 퍼블릭 도메인. 크레딧 권장: "National Park Service"
+Yellowstone National Park Sound Library (NPS & MSU Acoustic Atlas / Jennifer Jerrett, NPS / Neal Herbert)
+  https://www.nps.gov/yell/learn/photosmultimedia/sounds-wolves.htm
+  https://www.nps.gov/yell/learn/photosmultimedia/sounds-elk.htm
+  yell-YELLWolvesDec252013 (wolves howling), yell-YELLWolfvCar20160111T22ms2 (single wolf howl + passing car),
+  yell-YELLWolves20160111T20ms2 (wolf chorus), yell-ElkBugle1 / yell-ElkBugle2 (bull elk bugle)
+  https://www.nps.gov/yell/learn/photosmultimedia/sounds-bison.htm
+  yell-YELLMM8K2005914Bison / yell-YELLMM8K2005918Bison (bison bellow), YELL-BisonRut-JenniferJerrett (bison rut, 미사용)
+
+# 4루프 등 뒤 울음 (Creature/Loop4/cry_1~2.wav, FollowerMimic) — 늑대 하울 x0.68~0.72 + 밑에 엘크 bugle x0.5 (-9dB)
+  cry_1: WolvesDec25 1.5~7s + ElkBugle1 3~8.5s / cry_2: WolvesDec25 16.5~22.5s + ElkBugle2 12.5~16.5s
+  180Hz HP, FFT denoise, 1.1kHz LP (아주 멀리), dry 0.18 + long cave reverb (pink-noise IR ~5s) 2.6, compressed 5:1, 10s, peak -1dBFS (edited)
+
+# 5루프 괴물 그르렁→포효 (Creature/Loop5/growl_A~C.wav, MonsterReveal) — 들소 bellow로 그르렁, 이어서 늑대+엘크
+  growl_A: Bison918 5.9~7.7s x0.72 → Bison914 1.4~3.2s x0.68 + ElkBugle1 3~7s x0.85 + WolvesDec25 49.5~52.5s x0.9 (1.1~1.25s 뒤)
+  growl_B: Bison918 5.9~7.7s → 9.4~10.8s x0.68 + ElkBugle2 2~5s x0.8
+  growl_C: Bison914 1.4~3.2s x0.75 → wolf chorus 64.5~68.5s x0.85 + ElkBugle1 x0.7
+  bison 50Hz HP / wolf·elk 180Hz HP, FFT denoise, 9kHz LP, short cave reverb 0.45, compressed 5:1, 6.5s, peak -0.5dBFS (edited)
+  stomp_1~3.wav: Kenney impactSoft_heavy_000/002/004 (CC0), pitch x0.55, 2.5kHz LP, cave reverb 0.5, peak -1dBFS (edited) — 기어가는 발소리

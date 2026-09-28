@@ -34,6 +34,10 @@ namespace CaveGame
             public float triggerRadius = 2f;
             [Tooltip("비우면 화면 전체(2D)로 들린다. 지정하면 그 AudioSource(3D)의 위치에서 울린다")]
             public AudioSource emitter;
+            [Tooltip("소리 직후 머릿속(2D)에서 나는 반응 — 예: 흠칫 숨 들이켜기. 비우면 없음")]
+            public AudioClip reaction;
+            public float reactionDelay = 0.3f;
+            [Range(0f, 1f)] public float reactionVolume = 0.6f;
         }
 
         [SerializeField] Layer[] layers;
@@ -96,6 +100,10 @@ namespace CaveGame
             }
             yield return new WaitForSeconds(e.delay);
             (e.emitter != null ? e.emitter : eventSource).PlayOneShot(e.clip, e.volume);
+
+            if (e.reaction == null) yield break;
+            yield return new WaitForSeconds(e.reactionDelay);
+            eventSource.PlayOneShot(e.reaction, e.reactionVolume);
         }
 
         void Update()

@@ -2,10 +2,10 @@ using UnityEngine;
 
 namespace CaveGame
 {
-    // 4루프: 지정 지점을 지나면, 기어가는 도중 등 뒤에서 무언가 몸을 끌며 "스르륵" 다가오는 짐승 소리가 난다.
+    // 4루프: 지정 지점을 지나면, 기어가는 도중 등 뒤 먼 곳에서 동굴을 울리는 낮고 긴 울음이 난다 (5루프에 모습을 드러낼 그 괴물의 목소리).
     // 소리가 먼저 나서 플레이어가 뒤를 돌아보게 만든다 — 돌아본 곳엔 아무것도 없고, 다시 가면 또 난다.
     // - 플레이어가 절대 내지 않는 소리여야 한다: 내 기어가는 소리와 같은 계열이면 들려도 "내 소리"로 넘겨 버린다.
-    // - 일정 거리를 나아갈 때마다 한 번 (멈춰 서 있으면 잠시 뒤에도 한 번). 돌아보면 끊긴다.
+    // - 일정 거리를 나아갈 때마다 한 번 (멈춰 서 있으면 잠시 뒤에도 한 번). stopWhenLookedAt을 켜면 돌아볼 때 끊긴다.
     // - 들릴 때마다 가까워진다 (beatDistances). 마지막 뒤로는 영영 조용하다.
     //
     // "뒤"를 확실히 들리게 하는 법: Unity 기본 3D 사운드는 좌우 음량 차이만 계산해 정면과 정뒤가 똑같이 들린다.
@@ -32,11 +32,13 @@ namespace CaveGame
         [SerializeField] float idleBeatTime = 5f;
         [Tooltip("카메라 정면과 소리 방향의 내적이 이 값을 넘으면(돌아보면) 끊긴다")]
         [SerializeField, Range(-1f, 1f)] float lookBackDot = 0.1f;
+        [Tooltip("켜면 돌아볼 때 소리가 뚝 끊긴다 — 짧은 기척용. 동굴을 울리는 긴 울음은 끝까지 들려야 하니 끈다")]
+        [SerializeField] bool stopWhenLookedAt;
 
         [Header("소리")]
         [SerializeField] AudioSource source;
         [SerializeField] AudioLowPassFilter lowPass;
-        [Tooltip("기척 소리들 (지금은 무언가 몸을 끄는 짐승 소리) — 기척마다 하나씩, 같은 게 연달아 나오지 않게")]
+        [Tooltip("기척 소리들 (동굴을 울리는 낮고 긴 울음) — 기척마다 하나씩, 같은 게 연달아 나오지 않게")]
         [SerializeField] AudioClip[] knocks;
         [SerializeField, Range(0f, 1f)] float volume = 1f;
         [SerializeField] Vector2 pitch = new Vector2(0.9f, 1.05f);
@@ -122,7 +124,7 @@ namespace CaveGame
 
                 case State.Playing:
                     UpdateCutoff();
-                    if (LookingAt())
+                    if (stopWhenLookedAt && LookingAt())
                     {
                         source.Stop(); // 돌아보면 소리가 뚝 끊긴다 — 돌아본 곳엔 아무것도 없다
                         if (debugLog) Debug.Log("[FollowerMimic] 돌아봐서 기척이 끊김", this);
