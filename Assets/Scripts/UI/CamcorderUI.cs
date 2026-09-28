@@ -21,7 +21,7 @@ namespace CaveGame
             int minutes = Mathf.FloorToInt(elapsed / 60f);
             int seconds = Mathf.FloorToInt(elapsed % 60f);
             int centiseconds = Mathf.FloorToInt(elapsed * 100f) % 100;
-            timerText.text = $"{minutes:00}:{seconds:00}:{centiseconds:00}";
+            timerText.SetText("{0:00}:{1:00}:{2:00}", minutes, seconds, centiseconds); // 매 프레임 호출 — 문자열 할당 없는 버전
 
             blinkTimer += Time.deltaTime;
             if (blinkTimer >= blinkInterval)

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace CaveGame
 {
-    // 루프 이동(순간이동)과 루프별 몸의 변화(강제 웅크림)를 담당한다.
+    // 루프 이동(순간이동)과 루프별 몸의 변화(4루프부터 천장 자동 웅크림, 7루프 웅크린 채 시작)를 담당한다.
     // 표식·사운드·화면 효과는 각자 LoopListener로 반응하므로 여기서 호출하지 않는다.
     public class LoopManager : LoopListener
     {
@@ -13,21 +13,28 @@ namespace CaveGame
         [SerializeField] float teleportLift = 0.1f; // 구간마다 바닥 높이 오차가 있어 살짝 띄워 떨어뜨린다
         [SerializeField] EndingSequenceController ending;
 
-        [Header("천장이 낮아져 웅크리게 되는 루프")]
-        [SerializeField] int forcedCrouchFromLoop = 4;
-        [SerializeField] int forcedCrouchToLoop = 6;
+        [Header("웅크림")]
+        [Tooltip("이 루프부터 머리 위 천장이 가까우면 자동으로 웅크린다 (그 전 루프엔 적용 안 함)")]
+        [SerializeField] int autoCrouchFromLoop = 4;
         [Tooltip("이 루프는 웅크린 채로 시작하지만 강제는 아니다 — 웅크리기 키를 눌렀다 떼면 일어선다")]
         [SerializeField] int startCrouchedLoop = 7;
 
         CharacterController controller;
         bool endingTriggered;
         bool passedCheckpoint; // 마지막으로 중간 체크포인트를 앞으로 넘었는가 — 뒤로 넘으면 다시 false
+        Vector3 spawnPosition;
+        Quaternion spawnRotation;
 
         public Vector3 PlayerPosition => player.transform.position;
         // 순간이동 직후 모든 LoopTrigger가 즉시 새 위치를 기준으로 다시 잡는다 — 위치 점프를 "선 통과"로 착각하지 않게
         public event System.Action Teleported;
 
-        void Awake() => controller = player.GetComponent<CharacterController>();
+        void Awake()
+        {
+            controller = player.GetComponent<CharacterController>();
+            spawnPosition = player.transform.position;
+            spawnRotation = player.transform.rotation;
+        }
 
         public void OnLoopEndReached(Transform passedLine)
         {
@@ -56,23 +63,36 @@ namespace CaveGame
 
         public void OnReverseLoopReached(Transform passedLine) => TeleportRelative(passedLine, loopEndAnchor);
 
+        // 치트: 다음 루프로 넘기고 시작 지점으로 옮긴다 (지형이 바뀌어 벽 속에 끼지 않게)
+        public void SkipLoop()
+        {
+            if (endingTriggered || GameManager.Instance.IsLastLoop) return;
+            passedCheckpoint = false;
+            GameManager.Instance.AdvanceLoop();
+            Place(spawnPosition, spawnRotation);
+        }
+
         protected override void OnLoopChanged(int loop)
         {
-            player.SetLoopForcedCrouch(loop >= forcedCrouchFromLoop && loop <= forcedCrouchToLoop);
+            player.SetCeilingAutoCrouch(loop >= autoCrouchFromLoop);
             if (loop == startCrouchedLoop) player.HoldCrouchUntilRelease();
         }
 
         // from 선 기준 플레이어의 상대 위치·방향을 to 선 기준으로 옮긴다. 높이는 월드 값을 유지한다(바닥 높이가 거의 같음).
-        // CharacterController가 켜져 있으면 위치 대입이 무시되므로 잠시 끈다
         void TeleportRelative(Transform from, Transform to)
         {
             Transform p = player.transform;
             Vector3 target = to.TransformPoint(from.InverseTransformPoint(p.position));
             target.y = p.position.y + teleportLift;
             Quaternion yawDelta = Quaternion.Euler(0f, to.eulerAngles.y - from.eulerAngles.y, 0f);
+            Place(target, yawDelta * p.rotation);
+        }
 
+        // CharacterController가 켜져 있으면 위치 대입이 무시되므로 잠시 끈다
+        void Place(Vector3 position, Quaternion rotation)
+        {
             controller.enabled = false;
-            p.SetPositionAndRotation(target, yawDelta * p.rotation);
+            player.transform.SetPositionAndRotation(position, rotation);
             controller.enabled = true;
             Physics.SyncTransforms();
             Teleported?.Invoke();

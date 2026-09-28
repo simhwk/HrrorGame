@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace CaveGame
 {
-    // 카메라 정면으로 한 번 SphereCast를 쏴서 조준 중인 TouchableMarker를 찾고, E 입력을 전달한다.
+    // 카메라 정면으로 한 번 SphereCast를 쏴서 조준 중인 대상을 찾고, E 입력을 전달한다.
     [RequireComponent(typeof(PlayerController))]
     public class PlayerInteractor : MonoBehaviour
     {
@@ -13,7 +13,7 @@ namespace CaveGame
 
         PlayerController player;
 
-        public TouchableMarker Target { get; private set; }
+        public IInteractable Target { get; private set; }
 
         void Awake() => player = GetComponent<PlayerController>();
 
@@ -23,12 +23,12 @@ namespace CaveGame
             SetTarget(player.enabled ? FindTarget(out point) : null); // 엔딩 컷신 중엔 조작 불가
 
             if (Target != null && player.InteractPressed)
-                Target.Touch(point);
+                Target.Interact(point);
         }
 
         void OnDisable() => SetTarget(null);
 
-        TouchableMarker FindTarget(out Vector3 point)
+        IInteractable FindTarget(out Vector3 point)
         {
             point = default;
             Transform cam = player.CameraPivot;
@@ -39,10 +39,10 @@ namespace CaveGame
                 return null;
 
             point = hit.point;
-            return hit.collider.GetComponentInParent<TouchableMarker>();
+            return hit.collider.GetComponentInParent<IInteractable>();
         }
 
-        void SetTarget(TouchableMarker next)
+        void SetTarget(IInteractable next)
         {
             if (next == Target) return;
             if (Target != null) Target.SetHover(false);

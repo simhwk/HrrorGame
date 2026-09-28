@@ -8,11 +8,7 @@ namespace CaveGame
     {
         MarkerVariant[] variants;
 
-        void Awake()
-        {
-            variants = GetComponentsInChildren<MarkerVariant>(true);
-            foreach (var variant in variants) variant.Init();
-        }
+        void Awake() => variants = GetComponentsInChildren<MarkerVariant>(true);
 
         protected override void OnLoopChanged(int loop)
         {

@@ -9,8 +9,12 @@ namespace CaveGame
         [SerializeField] InputActionAsset inputActions;
         [SerializeField] Transform cameraPivot;
         [SerializeField] Transform handPivot;
-        [SerializeField] float cameraLagSpeed = 8f;
-        [SerializeField] float cameraYawLagSpeed = 5f;
+        [Header("카메라 지연 — 손전등은 마우스를 즉시, 카메라는 살짝 늦게 따라간다")]
+        [SerializeField] float cameraLagSpeed = 11f;     // 상하 (클수록 빨리 따라붙음)
+        [SerializeField] float cameraYawLagSpeed = 9f;  // 좌우
+        [Tooltip("카메라가 손전등보다 뒤처질 수 있는 최대 각도 — 확 돌아도 이 이상 벌어지지 않아 어지럽지 않다")]
+        [SerializeField] float maxCameraPitchLag = 6f;
+        [SerializeField] float maxCameraYawLag = 20f;
         [SerializeField] float standingHeight = 2.38f;
         [SerializeField] float crouchedHeight = 1.25f;
 
@@ -24,12 +28,17 @@ namespace CaveGame
         [SerializeField] float mouseSensitivity = 0.12f;
         [SerializeField] float gravity = -9.81f;
         [SerializeField] float heightBlendSpeed = 8f;
-        [SerializeField] float loopCrouchBlendSpeed = 1.5f; // 루프 강제 웅크림은 몸이 서서히 굽듯 천천히
+        [SerializeField] float loopCrouchBlendSpeed = 1.5f; // 루프 시작 웅크림은 몸이 서서히 굽듯 천천히
         [SerializeField] float lookUpLimit = 80f;
         [SerializeField] float lookDownLimit = 80f;
         [SerializeField] float crouchLookUpLimit = 20f;
-        [SerializeField] Vector3 crouchHandOffset = new Vector3(0f, -0.07f, -0.06f);
-        [SerializeField] float crouchHandPitch = 8f;
+
+        [Header("천장 자동 웅크림 — 선 채로 머리 위 여유가 이 값 이하면 웅크리고, 일어설 공간이 생기면 편다")]
+        [SerializeField] float autoCrouchClearance = 0.1f;
+        [Tooltip("일어설 땐 이만큼 더 여유가 있어야 편다 — 경계에서 앉았다 일어섰다 떨리지 않게")]
+        [SerializeField] float autoStandExtra = 0.15f;
+        [Tooltip("이동 방향으로 이만큼 앞의 천장도 검사한다 — 낮아지는 천장 턱에 머리가 먼저 걸리지 않게")]
+        [SerializeField] float ceilingLookAhead = 0.35f;
 
         CharacterController controller;
         InputAction moveAction;
@@ -41,11 +50,14 @@ namespace CaveGame
         float currentPitch;
         float cameraYawOffset;
         float verticalVelocity;
-        bool loopForcedCrouch;
+        bool ceilingCrouch;
+        bool ceilingAutoCrouch; // 루프가 켜 준다 (4루프부터)
+        readonly RaycastHit[] ceilingHits = new RaycastHit[8];
+        const float EyeProbeRadius = 0.1f;
         bool heldCrouch; // 루프 시작 시 웅크린 채로 시작 — 웅크리기 키를 눌렀다 떼면 풀린다
         Vector2 lastLookDelta;
         public Transform CameraPivot => cameraPivot;
-        public bool IsCrouched => loopForcedCrouch || heldCrouch || (crouchAction != null && crouchAction.IsPressed());
+        public bool IsCrouched => ceilingCrouch || heldCrouch || (crouchAction != null && crouchAction.IsPressed());
         public bool InteractPressed => interactAction != null && interactAction.WasPressedThisFrame();
         public Vector2 LastLookDelta => lastLookDelta;
         public Vector2 MoveInput => moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
@@ -72,6 +84,7 @@ namespace CaveGame
         {
             if (heldCrouch && crouchAction != null && crouchAction.WasReleasedThisFrame()) heldCrouch = false;
             HandleLook();
+            UpdateCeilingCrouch();
             HandleHeight();
             HandleMove();
         }
@@ -83,24 +96,26 @@ namespace CaveGame
 
             transform.Rotate(Vector3.up * delta.x);
 
-            cameraYawOffset -= delta.x;
-            cameraYawOffset = Mathf.Lerp(cameraYawOffset, 0f, Time.deltaTime * cameraYawLagSpeed);
+            // 지연은 상한으로 자르고, 프레임레이트와 무관하게 지수적으로 줄인다
+            cameraYawOffset = Mathf.Clamp(cameraYawOffset - delta.x, -maxCameraYawLag, maxCameraYawLag);
+            cameraYawOffset *= Mathf.Exp(-cameraYawLagSpeed * Time.deltaTime);
 
             float upLimit = Mathf.Lerp(lookUpLimit, Mathf.Min(lookUpLimit, crouchLookUpLimit), CrouchBlend());
             pitch = Mathf.Clamp(pitch - delta.y, -upLimit, lookDownLimit);
-            currentPitch = Mathf.LerpAngle(currentPitch, pitch, Time.deltaTime * cameraLagSpeed);
+            float pitchLag = Mathf.Clamp(currentPitch - pitch, -maxCameraPitchLag, maxCameraPitchLag);
+            currentPitch = pitch + pitchLag * Mathf.Exp(-cameraLagSpeed * Time.deltaTime);
 
             cameraPivot.localRotation = Quaternion.Euler(currentPitch, cameraYawOffset, 0f);
 
             if (handPivot != null)
-                handPivot.localRotation = Quaternion.Euler(pitch + crouchHandPitch * CrouchBlend(), 0f, 0f);
+                handPivot.localRotation = Quaternion.Euler(pitch, 0f, 0f);
         }
 
         void HandleHeight()
         {
             float targetHeight = IsCrouched ? crouchedHeight : standingHeight;
             bool manual = crouchAction != null && crouchAction.IsPressed();
-            float blendSpeed = (loopForcedCrouch || heldCrouch) && !manual ? loopCrouchBlendSpeed : heightBlendSpeed;
+            float blendSpeed = heldCrouch && !manual ? loopCrouchBlendSpeed : heightBlendSpeed;
             controller.height = Mathf.Lerp(controller.height, targetHeight, Time.deltaTime * blendSpeed);
             controller.center = new Vector3(0f, controller.height * 0.5f, 0f);
 
@@ -108,24 +123,48 @@ namespace CaveGame
             cameraPivot.localPosition = new Vector3(0f, eyeHeight, 0f);
 
             if (handPivot != null)
-                handPivot.localPosition = new Vector3(0f, eyeHeight, 0f) + handOffsetFromEye + crouchHandOffset * CrouchBlend();
+                handPivot.localPosition = new Vector3(0f, eyeHeight, 0f) + handOffsetFromEye;
         }
 
         // 캡슐 높이 변경(일어서기)은 충돌 판정 없이 늘어나므로, 위쪽을 직접 검사해 눈이 천장 밖으로 나가지 않게 막는다
-        float ClampEyeBelowCeiling(float eyeHeight)
-        {
-            const float probeRadius = 0.1f;
-            Vector3 origin = transform.position + Vector3.up * controller.radius;
-            float wantedTop = eyeHeight + ceilingMargin - controller.radius;
-            if (wantedTop <= 0f) return eyeHeight;
+        float ClampEyeBelowCeiling(float eyeHeight) =>
+            Mathf.Min(eyeHeight, CeilingHeightAt(transform.position, EyeProbeRadius) - ceilingMargin);
 
-            if (Physics.SphereCast(origin, probeRadius, Vector3.up, out RaycastHit hit, wantedTop + probeRadius,
-                    ceilingMask, QueryTriggerInteraction.Ignore))
+        void UpdateCeilingCrouch()
+        {
+            if (!ceilingAutoCrouch)
             {
-                float allowed = controller.radius + hit.distance + probeRadius - ceilingMargin;
-                return Mathf.Min(eyeHeight, allowed);
+                ceilingCrouch = false;
+                return;
             }
-            return eyeHeight;
+
+            float room = CeilingHeightAt(transform.position, controller.radius * 0.9f);
+            Vector2 input = MoveInput;
+            if (input.sqrMagnitude > 0.01f)
+            {
+                Vector3 dir = (transform.right * input.x + transform.forward * input.y).normalized;
+                room = Mathf.Min(room, CeilingHeightAt(transform.position + dir * ceilingLookAhead, controller.radius * 0.9f));
+            }
+
+            float spare = room - standingHeight; // 선 키 기준 머리 위 여유
+            if (!ceilingCrouch && spare <= autoCrouchClearance) ceilingCrouch = true;
+            else if (ceilingCrouch && spare >= autoCrouchClearance + autoStandExtra) ceilingCrouch = false;
+        }
+
+        // 발바닥에서 바로 위 천장까지의 높이. 천장이 없으면 무한대.
+        // 선 키로 쏘면 이미 천장에 파묻힌 머리에서 레이가 시작돼 못 맞히므로, 발 쪽에서 위로 쏜다.
+        // 웅크림 판정은 몸통 폭(굵은 구), 눈 높이 제한은 머리 한가운데(가는 구)로 검사한다
+        float CeilingHeightAt(Vector3 feet, float probe)
+        {
+            Vector3 origin = feet + Vector3.up * controller.radius;
+            int count = Physics.SphereCastNonAlloc(origin, probe, Vector3.up, ceilingHits, standingHeight + 1f,
+                ceilingMask, QueryTriggerInteraction.Ignore);
+
+            float nearest = float.PositiveInfinity;
+            for (int i = 0; i < count; i++)
+                if (ceilingHits[i].collider != controller && ceilingHits[i].distance > 0f) // 자기 캡슐, 시작부터 겹친 것 제외
+                    nearest = Mathf.Min(nearest, ceilingHits[i].distance);
+            return controller.radius + nearest + probe;
         }
 
         float CrouchBlend() => Mathf.Clamp01(Mathf.InverseLerp(standingHeight, crouchedHeight, controller.height));
@@ -143,7 +182,7 @@ namespace CaveGame
             controller.Move(move * Time.deltaTime);
         }
 
-        public void SetLoopForcedCrouch(bool value) => loopForcedCrouch = value;
+        public void SetCeilingAutoCrouch(bool enabled) => ceilingAutoCrouch = enabled;
 
         public void HoldCrouchUntilRelease() => heldCrouch = true;
     }

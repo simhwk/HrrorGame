@@ -9,17 +9,9 @@ namespace CaveGame
         [SerializeField, Min(1)] int fromLoop = 1;
         [SerializeField, Min(1)] int toLoop = 1;
 
-        TouchableMarker touchable;
-
         public bool IsVisibleIn(int loop) => loop >= fromLoop && loop <= toLoop;
 
-        public void Init() => touchable = GetComponentInChildren<TouchableMarker>(true);
-
-        public void SetVisible(bool visible)
-        {
-            gameObject.SetActive(visible);
-            if (visible && touchable != null) touchable.ResetTouch();
-        }
+        public void SetVisible(bool visible) => gameObject.SetActive(visible);
 
         void OnValidate()
         {

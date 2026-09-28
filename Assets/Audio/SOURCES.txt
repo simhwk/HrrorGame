@@ -61,3 +61,7 @@ Audio sources
     https://pixabay.com/sound-effects/horror-eerie-wind-478386/
     https://pixabay.com/sound-effects/film-special-effects-cave-wind-10-76283/
     https://pixabay.com/sound-effects/film-special-effects-wind-underground-sfx-522599/
+
+# Guideline rope stroke (Props/Fabric/coat_stroke_1~5.wav) — cut from:
+Synthetic Coat Rubbed — BigSoundBank (CC0), Joseph SARDIN, https://bigsoundbank.com/synthetic-coat-rubbed-s1104.html
+  original: Props/Source/bsb__synthetic_coat_rubbed_1104.ogg. Processed: 120Hz HP + 6kHz LP, 5 smoothest hand strokes, fades, -16dB RMS (peak-limited -0.9dB).

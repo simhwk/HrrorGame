@@ -13,8 +13,6 @@ namespace CaveGame
         [SerializeField] float crouchStepInterval = 0.75f;
         [SerializeField] int offBeatFromLoop = 3;
         [SerializeField] float offBeatAmount = 0.12f;
-        [SerializeField] int fourBeatFromLoop = 5;
-        [SerializeField] float fourBeatGap = 0.12f;
 
         [Header("Breathing")]
         [SerializeField] AudioClip[] breathingByLoop = new AudioClip[7];
@@ -41,7 +39,6 @@ namespace CaveGame
         AudioSource dragSource;
         float stepTimer;
         int stepIndex;
-        float extraStepTimer = -1f;
         bool wasCrouched;
 
         int CurrentLoop => GameManager.Instance != null ? GameManager.Instance.CurrentLoop : 1;
@@ -72,12 +69,6 @@ namespace CaveGame
 
         void UpdateFootsteps()
         {
-            if (extraStepTimer > 0f)
-            {
-                extraStepTimer -= Time.deltaTime;
-                if (extraStepTimer <= 0f) PlayStep(0.7f);
-            }
-
             bool moving = player.MoveInput.sqrMagnitude > 0.01f && player.IsGrounded;
             if (!moving)
             {
@@ -88,39 +79,36 @@ namespace CaveGame
             stepTimer -= Time.deltaTime;
             if (stepTimer > 0f) return;
 
-            PlayStep(1f);
+            PlayStep();
 
             float interval = player.IsCrouched ? crouchStepInterval : stepInterval;
             if (CurrentLoop >= offBeatFromLoop)
                 interval += Random.Range(-offBeatAmount, offBeatAmount);
             stepTimer = interval;
-
-            if (CurrentLoop >= fourBeatFromLoop)
-                extraStepTimer = fourBeatGap;
         }
 
         bool Crawling => player.IsCrouched && crawlContacts.Length > 0;
 
-        void PlayStep(float scale)
+        void PlayStep()
         {
             if (Crawling)
             {
-                PlayCrawl(scale);
+                PlayCrawl();
                 return;
             }
             if (steps.Length == 0) return;
             stepSource.pitch = Random.Range(0.9f, 1.1f);
-            stepSource.PlayOneShot(steps[stepIndex], stepVolume * scale);
+            stepSource.PlayOneShot(steps[stepIndex], stepVolume);
             stepIndex = (stepIndex + 1) % steps.Length;
         }
 
         // 손/무릎이 바닥을 짚는 소리. 옷 스침은 확률로 살짝 늦게 겹쳐 리듬을 흐트러뜨린다
-        void PlayCrawl(float scale)
+        void PlayCrawl()
         {
             stepSource.pitch = Random.Range(0.75f, 0.95f);
-            stepSource.PlayOneShot(crawlContacts[Random.Range(0, crawlContacts.Length)], crawlContactVolume * scale);
+            stepSource.PlayOneShot(crawlContacts[Random.Range(0, crawlContacts.Length)], crawlContactVolume);
             if (crawlCloth.Length > 0 && Random.value < crawlClothChance)
-                stepSource.PlayOneShot(crawlCloth[Random.Range(0, crawlCloth.Length)], crawlClothVolume * scale);
+                stepSource.PlayOneShot(crawlCloth[Random.Range(0, crawlCloth.Length)], crawlClothVolume);
         }
 
         void UpdateCrawlDrag()
