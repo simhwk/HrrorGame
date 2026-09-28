@@ -12,6 +12,7 @@ namespace CaveGame
         [SerializeField] LayerMask aimMask = ~0;
 
         PlayerController player;
+        readonly RaycastHit[] hits = new RaycastHit[8];
 
         public IInteractable Target { get; private set; }
 
@@ -33,13 +34,22 @@ namespace CaveGame
             point = default;
             Transform cam = player.CameraPivot;
 
-            // 벽 뒤의 표식은 가려지도록, 처음 맞은 콜라이더가 표식일 때만 인정
-            if (!Physics.SphereCast(cam.position, aimRadius, cam.forward, out RaycastHit hit, range,
-                                    aimMask, QueryTriggerInteraction.Ignore))
-                return null;
+            // 벽 뒤의 표식은 가려지도록, 처음 맞은 콜라이더가 표식일 때만 인정.
+            // 카메라가 캡슐 안쪽 위에 있어 바닥을 내려다보면 자기 몸에 먼저 맞으므로 플레이어 콜라이더는 건너뛴다
+            int count = Physics.SphereCastNonAlloc(cam.position, aimRadius, cam.forward, hits, range,
+                                                   aimMask, QueryTriggerInteraction.Ignore);
+            RaycastHit nearest = default;
+            float nearestDistance = float.MaxValue;
+            for (int i = 0; i < count; i++)
+            {
+                if (hits[i].collider.transform.IsChildOf(transform) || hits[i].distance >= nearestDistance) continue;
+                nearest = hits[i];
+                nearestDistance = hits[i].distance;
+            }
+            if (nearest.collider == null) return null;
 
-            point = hit.point;
-            return hit.collider.GetComponentInParent<IInteractable>();
+            point = nearest.point;
+            return nearest.collider.GetComponentInParent<IInteractable>();
         }
 
         void SetTarget(IInteractable next)

@@ -62,6 +62,6 @@ Audio sources
     https://pixabay.com/sound-effects/film-special-effects-cave-wind-10-76283/
     https://pixabay.com/sound-effects/film-special-effects-wind-underground-sfx-522599/
 
-# Guideline rope stroke (Props/Fabric/coat_stroke_1~5.wav) — cut from:
-Synthetic Coat Rubbed — BigSoundBank (CC0), Joseph SARDIN, https://bigsoundbank.com/synthetic-coat-rubbed-s1104.html
-  original: Props/Source/bsb__synthetic_coat_rubbed_1104.ogg. Processed: 120Hz HP + 6kHz LP, 5 smoothest hand strokes, fades, -16dB RMS (peak-limited -0.9dB).
+# Guideline rope brush (Props/Fabric/hand_brush_1~5.wav) — cut from:
+Rubbing Hands — BigSoundBank (CC0), Joseph SARDIN, https://bigsoundbank.com/rubbing-hands-s0663.html
+  original: Props/Source/bsb__rubbing_hands_0663.ogg. Processed: 150Hz HP + 3kHz LP (single 2nd-order), 5 short smooth brushes (0.24-0.33s), fades, -17dB RMS.
