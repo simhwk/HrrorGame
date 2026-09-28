@@ -36,6 +36,9 @@ namespace CaveGame
 
         AudioSource stepSource;
         AudioSource breathSource;
+        public AudioSource BreathSource => breathSource; // 렌즈 김서림이 숨 박자를 읽는다
+        // 1이면 평소, 0에 가까울수록 숨을 죽인다 — 뒤에서 기척이 들릴 때 숨을 참는 느낌 (FollowerMimic)
+        public float BreathDuck { get; set; } = 1f;
         AudioSource dragSource;
         float stepTimer;
         int stepIndex;
@@ -151,7 +154,11 @@ namespace CaveGame
             }
 
             if (target != null)
-                breathSource.volume = Mathf.MoveTowards(breathSource.volume, breathingVolume, fadeStep);
+            {
+                // 숨 죽이기는 페이드보다 빨라야 한다 — 소리를 들은 순간 멎는 느낌
+                float step = BreathDuck < 1f ? fadeStep * 6f : fadeStep;
+                breathSource.volume = Mathf.MoveTowards(breathSource.volume, breathingVolume * BreathDuck, step);
+            }
         }
 
         void UpdateCrouch()

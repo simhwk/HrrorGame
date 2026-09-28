@@ -65,3 +65,19 @@ Audio sources
 # Guideline rope brush (Props/Fabric/hand_brush_1~5.wav) — cut from:
 Rubbing Hands — BigSoundBank (CC0), Joseph SARDIN, https://bigsoundbank.com/rubbing-hands-s0663.html
   original: Props/Source/bsb__rubbing_hands_0663.ogg. Processed: 150Hz HP + 3kHz LP (single 2nd-order), 5 short smooth brushes (0.24-0.33s), fades, -17dB RMS.
+
+  Rocks/cairn_collapse.wav: 3 falls cut from BigSoundBank #1022 (Fall of Stone) at 16.3s / 26.9s / 21.3s,
+    staggered 0 / 0.38 / 0.9s, 90Hz HP + 3.2kHz LP, multi-tap cave echo, +10dB into limiter at -1dBFS (edited)
+
+  Footsteps/Far/stone_step_far_*.wav: Fantozzi Stone L1/R1/L2/R2 (OpenGameArt, CC0), 120Hz HP + 3.5kHz LP, direct -14dB + synthetic cave reverb (pink-noise IR, ~1s decay),
+    peak -1dBFS (edited) — 3루프 갈림길에서 멀어지는 정체불명 발소리용
+  Footsteps/Far/follower_drag.wav: BigSoundBank #0839 (Feet on Pebbles), 150Hz HP, compressed 8:1 @-34dB, +20dB into limiter (edited) — 4루프 뒤따라오는 기척용
+  Footsteps/Far/pebble_kick_1~4.wav: "75 CC0 breaking/falling/hit sfx" rock_falling_01/03/08/09 (OpenGameArt, CC0),
+    100Hz HP, compressed 4:1, light cave echo, +10dB into limiter (edited) — 4루프 뒤에서 누가 돌을 찬 기척
+  Breathing/gasp_short.wav: BigSoundBank #1103 (Breathless Man) 0.85~1.27s, 1.25x tempo, 250Hz HP, fades (edited) — 4루프 뒤 기척에 흠칫하는 숨
+
+# 4루프 등 뒤 기척 (Props/Fabric/rope_slide_1~4.wav, FollowerMimic에서 pitch 0.72~0.85) — 2026-09-29. 줄 소리로는 부적합 판정 → 짐승이 몸을 끄는 소리로 전용
+Sliding rope #1, #2, #4, #6 — BigSoundBank (CC0), Joseph SARDIN
+  https://bigsoundbank.com/sliding-rope-1-s1818.html  (and s1819, s1821, s1823)
+  originals: Props/Source/bsb__sliding_rope_{1_1818,2_1819,4_1821,6_1823}.ogg
+  Processed: 120Hz HP + 4kHz LP, 0.7~0.85s cuts with slow fade-in (0.05~0.2s) and 0.3s fade-out, -20dB RMS.

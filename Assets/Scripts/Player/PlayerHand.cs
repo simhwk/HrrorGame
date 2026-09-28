@@ -9,7 +9,7 @@ namespace CaveGame
     {
         [Tooltip("손전등(Spot Light). 비워두면 자식에서 찾는다")]
         [SerializeField] Transform beam;
-        [SerializeField] float reach = 1.8f;
+        [SerializeField] float reach = 0.9f;
 
         public bool Touching { get; set; }
 

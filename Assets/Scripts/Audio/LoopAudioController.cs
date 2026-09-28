@@ -27,8 +27,13 @@ namespace CaveGame
             public string name;
             public int loop = 2;
             public AudioClip clip;
+            [Tooltip("trigger가 비어 있으면 루프 시작부터, 있으면 플레이어가 그 지점 반경에 들어간 뒤부터 센다")]
             public float delay = 10f;
             [Range(0f, 1f)] public float volume = 0.8f;
+            public Transform trigger;
+            public float triggerRadius = 2f;
+            [Tooltip("비우면 화면 전체(2D)로 들린다. 지정하면 그 AudioSource(3D)의 위치에서 울린다")]
+            public AudioSource emitter;
         }
 
         [SerializeField] Layer[] layers;
@@ -36,6 +41,7 @@ namespace CaveGame
         [SerializeField] float fadeTime = 3f;
 
         AudioSource eventSource;
+        Transform player;
 
         void Awake()
         {
@@ -82,8 +88,14 @@ namespace CaveGame
 
         IEnumerator PlayEvent(LoopEvent e)
         {
+            if (e.trigger != null)
+            {
+                if (player == null) player = FindFirstObjectByType<PlayerController>().transform;
+                float r2 = e.triggerRadius * e.triggerRadius;
+                while (FlatSqrDistance(player.position, e.trigger.position) > r2) yield return null;
+            }
             yield return new WaitForSeconds(e.delay);
-            eventSource.PlayOneShot(e.clip, e.volume);
+            (e.emitter != null ? e.emitter : eventSource).PlayOneShot(e.clip, e.volume);
         }
 
         void Update()
@@ -110,5 +122,12 @@ namespace CaveGame
         }
 
         static AudioClip RandomClip(Layer layer) => layer.clips[Random.Range(0, layer.clips.Length)];
+
+        // 높이는 무시 — 웅크림·바닥 요철과 무관하게
+        static float FlatSqrDistance(Vector3 a, Vector3 b)
+        {
+            a.y = b.y;
+            return (a - b).sqrMagnitude;
+        }
     }
 }

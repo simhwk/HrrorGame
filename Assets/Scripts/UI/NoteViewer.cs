@@ -16,6 +16,7 @@ namespace CaveGame
         [SerializeField] PlayerController player;
 
         TMP_FontAsset defaultFont;
+        int openedFrame = -1;
         int closedFrame = -1;
 
         void Awake()
@@ -40,11 +41,14 @@ namespace CaveGame
             text.text = content;
             panel.SetActive(true);
             player.enabled = false;
+            openedFrame = Time.frameCount;
         }
 
         void Update()
         {
-            if (!panel.activeSelf) return;
+            // 연 프레임엔 닫기를 받지 않는다 — PlayerInteractor가 이 스크립트보다 먼저 돌면,
+            // 열 때 누른 E가 같은 프레임의 "닫기"로도 잡혀 열리자마자 닫힌다 (실행 순서는 보장되지 않음)
+            if (!panel.activeSelf || Time.frameCount == openedFrame) return;
 
             // 플레이어를 꺼 둔 상태라 그쪽 입력 대신 키보드를 직접 읽는다
             var kb = Keyboard.current;
