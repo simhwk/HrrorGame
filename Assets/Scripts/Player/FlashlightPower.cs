@@ -19,10 +19,14 @@ namespace CaveGame
         [Tooltip("깜빡이는 동안 켜진 순간의 밝기 배율 — 전력이 모자라 흐릿하다")]
         [SerializeField] Vector2 dimLevel = new Vector2(0.25f, 0.8f);
 
-        [Header("소리 (비우면 없음)")]
+        [Header("소리 (비우면 없음) — 지직지직… 띡")]
+        [Tooltip("비우면 손전등에 2D AudioSource를 만든다 — 내 손에 든 물건이라 머릿속에서 들리게")]
         [SerializeField] AudioSource sfx;
-        [SerializeField] AudioClip[] buzz; // 지직 — 깜빡일 때
-        [SerializeField, Range(0f, 1f)] float buzzVolume = 0.25f;
+        [SerializeField] AudioClip[] buzz; // 지직 — 깜빡여 켜질 때마다
+        [SerializeField, Range(0f, 1f)] float buzzVolume = 0.6f;
+        [SerializeField, Range(0f, 1f)] float buzzChance = 0.85f;
+        [SerializeField] AudioClip click; // 띡 — 완전히 꺼지는 순간, 다시 켜지는 순간
+        [SerializeField, Range(0f, 1f)] float clickVolume = 0.8f;
 
         float baseIntensity;
         public bool IsOn { get; private set; } = true;
@@ -31,6 +35,12 @@ namespace CaveGame
         {
             if (beam == null) beam = GetComponent<Light>();
             baseIntensity = beam.intensity;
+            if (sfx == null)
+            {
+                sfx = gameObject.AddComponent<AudioSource>();
+                sfx.playOnAwake = false;
+                sfx.spatialBlend = 0f;
+            }
         }
 
         void OnDisable() => Set(1f); // 루프 이동 등으로 연출이 끊겨도 영영 꺼진 채로 남지 않게
@@ -57,11 +67,19 @@ namespace CaveGame
                 yield return new WaitForSeconds(Random.Range(offTime.x, offTime.y));
 
                 Set(Random.Range(dimLevel.x, dimLevel.y) * Mathf.Lerp(0.5f, 1f, fading));
-                if (sfx != null && buzz != null && buzz.Length > 0 && Random.value < 0.6f)
+                if (buzz != null && buzz.Length > 0 && Random.value < buzzChance)
+                {
+                    sfx.pitch = Random.Range(0.9f, 1.1f);
                     sfx.PlayOneShot(buzz[Random.Range(0, buzz.Length)], buzzVolume);
+                }
                 yield return new WaitForSeconds(Mathf.Lerp(onTime.x, onTime.y, fading) * Random.Range(0.6f, 1f));
             }
             Set(turnOn ? 1f : 0f);
+            if (click != null)
+            {
+                sfx.pitch = 1f;
+                sfx.PlayOneShot(click, clickVolume);
+            }
         }
     }
 }

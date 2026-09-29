@@ -11,15 +11,18 @@ namespace CaveGame
     {
         public static Heartbeat Instance { get; private set; }
 
-        [SerializeField] AudioClip beat; // 쿵-쿵 한 번
+        [Tooltip("쿵-쿵 한 번짜리 박동들 — 매번 다른 걸 골라 같은 소리가 반복되는 티를 없앤다")]
+        [SerializeField] AudioClip[] beats;
         [Tooltip("루프별 최대 세기 (0~1). 인덱스 0 = 1루프")]
         [SerializeField] float[] strengthByLoop = { 0f, 0f, 0f, 0.3f, 0.6f, 0.4f, 0.75f };
 
-        [Header("세기 0 → 1 매핑")]
-        [SerializeField] Vector2 volume = new Vector2(0.12f, 0.45f);
+        [Header("세기 0 → 1 매핑 — 루프마다 빠르기뿐 아니라 크기도 달라진다")]
+        [Tooltip("세기 0 / 1일 때 음량. 루프별로 4: 0.55 · 5: 0.74 · 6: 0.61 · 7: 0.84")]
+        [SerializeField] Vector2 volume = new Vector2(0.35f, 1f);
         [SerializeField] Vector2 bpm = new Vector2(64f, 100f);
-        [Tooltip("저역통과 주파수 — 약할 땐 가슴속에서 울리듯 먹먹하게")]
-        [SerializeField] Vector2 cutoff = new Vector2(450f, 1400f);
+        [Tooltip("저역통과 주파수 — 약할 땐 먹먹하게. 심장 원음은 30Hz라 노트북·이어폰은 재생을 못 한다 — " +
+                 "옥타브 올린 층(120~500Hz)이 들려야 하므로 그 아래로 깎지 말 것")]
+        [SerializeField] Vector2 cutoff = new Vector2(1500f, 4000f);
 
         [Header("반응 속도 (초) — 0에서 그 루프의 최대 세기까지")]
         [SerializeField] float attack = 1.2f;
@@ -29,6 +32,7 @@ namespace CaveGame
         AudioLowPassFilter lowPass;
         float loopStrength;
         float level, target, holdUntil, nextBeat;
+        int lastBeat = -1;
 
         public float Level => level;
 
@@ -72,7 +76,7 @@ namespace CaveGame
             level = Mathf.MoveTowards(level, goal, speed * Time.deltaTime);
             if (!holding && level <= 0f) target = 0f;
 
-            if (beat == null || level <= 0.01f)
+            if (beats == null || beats.Length == 0 || level <= 0.01f)
             {
                 nextBeat = 0f; // 다시 시작하면 바로 첫 박동
                 return;
@@ -82,7 +86,10 @@ namespace CaveGame
             if (Time.time < nextBeat) return;
 
             // 시작·끝은 음량이 0에서 스며들고 빠지게 — level 자체가 음량 곡선
-            source.PlayOneShot(beat, Mathf.Lerp(volume.x, volume.y, level) * Mathf.Clamp01(level * 4f));
+            int i = Random.Range(0, beats.Length);
+            if (beats.Length > 1 && i == lastBeat) i = (i + 1) % beats.Length;
+            lastBeat = i;
+            source.PlayOneShot(beats[i], Mathf.Lerp(volume.x, volume.y, level) * Mathf.Clamp01(level * 4f));
             float interval = 60f / Mathf.Lerp(bpm.x, bpm.y, level);
             nextBeat = Time.time + interval * Random.Range(0.97f, 1.03f); // 사람 심장은 메트로놈이 아니다
         }

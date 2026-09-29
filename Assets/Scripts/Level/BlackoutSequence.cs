@@ -29,15 +29,17 @@ namespace CaveGame
         [SerializeField] float flickerOutTime = 2f;
         [SerializeField] float darkBeforeSteps = 2.5f;
 
-        [Header("③ 발소리 — 경로 점마다 한 걸음, 먼 곳 → 가까운 곳")]
+        [Header("③ 발소리 — 경로 점마다 한 걸음. 왼쪽 갈래에서 나와 갈림길 앞을 지나 오른쪽 갈래로 멀어진다")]
         [SerializeField] AudioSource stepSource; // 3D. 경로 점의 부모가 아닌 별도 오브젝트
         [SerializeField] Transform[] stepPath;
         [SerializeField] AudioClip[] steps;
-        [SerializeField, Range(0f, 1f)] float stepVolume = 0.8f;
+        [SerializeField, Range(0f, 1f)] float stepVolume = 1f;
         [Tooltip("걸음 사이 간격 — 서두르지 않는 걸음")]
         [SerializeField] Vector2 stepInterval = new Vector2(0.75f, 0.95f);
         [SerializeField] Vector2 stepPitch = new Vector2(0.9f, 1.0f);
-        [Tooltip("첫 걸음 / 마지막 걸음의 심장 세기 배율 (6루프 최대 세기 기준)")]
+        [Tooltip("발소리가 이 거리(m)보다 멀 때 / 이 거리 안일 때 — 심장 세기가 최소 / 최대")]
+        [SerializeField] Vector2 heartDistance = new Vector2(9f, 3f);
+        [Tooltip("가장 멀 때 / 가장 가까울 때 심장 세기 배율 (6루프 최대 세기 기준)")]
         [SerializeField] Vector2 heartScale = new Vector2(0.35f, 1f);
 
         [Header("④ 정적")]
@@ -103,10 +105,13 @@ namespace CaveGame
 
             // ③
             int last = -1;
+            float peak = heartScale.x;
             for (int i = 0; i < stepPath.Length; i++)
             {
-                float t = stepPath.Length > 1 ? (float)i / (stepPath.Length - 1) : 1f;
-                Heartbeat.Instance?.Raise(stepInterval.y + 0.5f, Mathf.Lerp(heartScale.x, heartScale.y, t)); // 다음 걸음까지 이어진다
+                // 가까울수록 빨라진다 — 지나쳐 멀어져도 한 번 치솟은 심장은 쉽게 가라앉지 않는다
+                float near = Mathf.InverseLerp(heartDistance.x, heartDistance.y, Vector3.Distance(stepPath[i].position, player.transform.position));
+                peak = Mathf.Max(peak, Mathf.Lerp(heartScale.x, heartScale.y, near));
+                Heartbeat.Instance?.Raise(stepInterval.y + 0.5f, peak); // 다음 걸음까지 이어진다
 
                 stepSource.transform.position = stepPath[i].position;
                 int c = Random.Range(0, steps.Length);
@@ -118,7 +123,7 @@ namespace CaveGame
             }
 
             // ④ 심장은 최고조로 뛴 채
-            Heartbeat.Instance?.Raise(silenceTime + flickerOnTime + heartAfterLight, heartScale.y);
+            Heartbeat.Instance?.Raise(silenceTime + flickerOnTime + heartAfterLight, peak);
             yield return new WaitForSeconds(silenceTime);
 
             // ⑤ — 불이 먼저, 소리는 천천히
