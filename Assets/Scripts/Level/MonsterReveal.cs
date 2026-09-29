@@ -53,6 +53,8 @@ namespace CaveGame
         [SerializeField] AudioClip[] steps;
         [SerializeField, Range(0f, 1f)] float stepVolume = 0.6f;
         [SerializeField] float stepInterval = 0.45f;
+        [Tooltip("괴물이 사라진 뒤에도 심장이 최고조로 뛰는 시간 — 그 뒤 천천히 가라앉는다")]
+        [SerializeField] float heartAfterHide = 2.5f;
 
         State state = State.Done;
         float stateTime, nextStep, gaspAt = -1f;
@@ -88,6 +90,9 @@ namespace CaveGame
                 gaspAt = -1f;
                 if (gasp != null) gaspSource.PlayOneShot(gasp, gaspVolume);
             }
+
+            // 괴물을 본 순간부터 사라지고 조금 뒤까지 (세기는 Heartbeat의 5루프 값)
+            if (state == State.Holding || state == State.Crawling) Heartbeat.Instance?.Raise(heartAfterHide);
 
             switch (state)
             {

@@ -51,6 +51,8 @@ namespace CaveGame
         [SerializeField] float gaspDelay = 0.18f;
         [Tooltip("기척이 나는 동안 플레이어 숨소리 배율 — 숨을 죽인다")]
         [SerializeField, Range(0f, 1f)] float breathDuck = 0.15f;
+        [Tooltip("울음이 끝난 뒤에도 심장이 뛰는 시간 (세기는 Heartbeat의 4루프 값)")]
+        [SerializeField] float heartAfterBeat = 3f;
         [Tooltip("켜면 발동·기척마다 콘솔에 남기고, F2로 지금 바로 등 뒤에서 기척 하나를 낸다 — 음량 확인용")]
         [SerializeField] bool debugLog;
 
@@ -156,6 +158,7 @@ namespace CaveGame
             beatEnd = Time.time + source.clip.length + 0.2f;
             gaspAt = Time.time + gaspDelay;
             if (playerAudio != null) playerAudio.BreathDuck = breathDuck;
+            Heartbeat.Instance?.Raise(source.clip.length + heartAfterBeat); // 울음을 듣고 약하게 — 5루프에 뜻을 알게 될 복선
 
             if (debugLog)
                 Debug.Log($"[FollowerMimic] 기척 {beat + 1}/{beatDistances.Length} — {beatDistances[beat]}m, " +

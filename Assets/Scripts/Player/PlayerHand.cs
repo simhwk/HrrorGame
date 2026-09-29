@@ -15,6 +15,11 @@ namespace CaveGame
 
         public Vector3 Start => Beam.position;
         public Vector3 End => Beam.position + Beam.forward * reach;
+        // 손전등이 꺼지면 손도 줄을 찾지 못한다 — 줄은 빛이 가로지를 때만 존재한다
+        public bool Lit => beamLight == null || beamLight.enabled;
+
+        Light beamLight;
+        void Awake() => beamLight = Beam.GetComponent<Light>();
 
         Transform Beam
         {

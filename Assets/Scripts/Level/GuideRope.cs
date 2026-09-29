@@ -68,6 +68,12 @@ namespace CaveGame
         void Update()
         {
             if (hand == null || path == null || path.Length < 2) return;
+            if (!hand.Lit)
+            {
+                lastSide = null; // 다시 켜졌을 때 어둠 속 이동을 "훑었다"로 착각하지 않게
+                hand.Touching = false;
+                return;
+            }
 
             int segments = path.Length - 1;
             if (lastSide == null || lastSide.Length != segments)

@@ -38,6 +38,12 @@ namespace CaveGame
             activeCues[index] = source;
         }
 
+        void Update()
+        {
+            foreach (var cue in activeCues)
+                if (cue != null) cue.volume = cueVolume * AmbienceDuck.Level;
+        }
+
         public void PlayAttack(Vector3 position)
         {
             if (attackSource == null) return;

@@ -19,6 +19,7 @@ namespace CaveGame
             [System.NonSerialized] public AudioSource source;
             [System.NonSerialized] public bool active;
             [System.NonSerialized] public float timer;
+            [System.NonSerialized] public float fade; // 켜짐/꺼짐 페이드 (0~volume) — 실제 음량은 여기에 환경음 배율을 곱한다
         }
 
         [System.Serializable]
@@ -111,9 +112,10 @@ namespace CaveGame
             foreach (var layer in layers)
             {
                 float target = layer.active ? layer.volume : 0f;
-                layer.source.volume = Mathf.MoveTowards(layer.source.volume, target, Time.deltaTime / fadeTime);
+                layer.fade = Mathf.MoveTowards(layer.fade, target, Time.deltaTime / fadeTime);
+                layer.source.volume = layer.fade * AmbienceDuck.Level;
 
-                if (!layer.active && layer.source.volume <= 0f && layer.source.isPlaying)
+                if (!layer.active && layer.fade <= 0f && layer.source.isPlaying)
                     layer.source.Stop();
 
                 if (layer.active && !layer.continuous)
@@ -122,7 +124,7 @@ namespace CaveGame
                     if (layer.timer <= 0f)
                     {
                         layer.source.pitch = Random.Range(0.9f, 1.1f);
-                        layer.source.PlayOneShot(RandomClip(layer));
+                        layer.source.PlayOneShot(RandomClip(layer), AmbienceDuck.Level);
                         layer.timer = Random.Range(layer.interval.x, layer.interval.y);
                     }
                 }

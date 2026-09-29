@@ -83,7 +83,7 @@ namespace CaveGame
             s.transform.position = spot;
             s.pitch = Random.Range(pitch.x, pitch.y);
             s.clip = clips[Random.Range(0, clips.Length)];
-            s.volume = volume * Random.Range(0.7f, 1f);
+            s.volume = volume * Random.Range(0.7f, 1f) * AmbienceDuck.Level;
             s.Play();
         }
     }
