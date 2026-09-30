@@ -65,3 +65,6 @@ desktop.ini
 !/build/gen_ppt.js
 !/build/package.json
 !/build/package-lock.json
+
+# 빌드 중 Unity Performance Testing이 잠깐 만들었다 지우는 파일
+/[Aa]ssets/[Rr]esources/PerformanceTestRun*
