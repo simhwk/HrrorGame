@@ -11,3 +11,4 @@
 | Dropped | digital_wrist_watch, pocket_watch, seadogs_compass, garden_gloves_01, rubber_boots, fishermans_hat | 도망치다 떨어뜨린 물건 |
 | Supplies | long_life_food, can_rusted, cigarette_pack, medical_box, trashbag | 야영/보급 흔적 |
 | Gear | picke_dirty_01, vintage_radio_transceiver | 탐사 장비 |
+| Title | television_02 | 타이틀 화면의 브라운관 TV |

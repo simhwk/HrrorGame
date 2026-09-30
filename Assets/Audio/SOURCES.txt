@@ -101,3 +101,76 @@ Yellowstone National Park Sound Library (NPS & MSU Acoustic Atlas / Jennifer Jer
   growl_C: Bison914 1.4~3.2s x0.75 → wolf chorus 64.5~68.5s x0.85 + ElkBugle1 x0.7
   bison 50Hz HP / wolf·elk 180Hz HP, FFT denoise, 9kHz LP, short cave reverb 0.45, compressed 5:1, 6.5s, peak -0.5dBFS (edited)
   stomp_1~3.wav: Kenney impactSoft_heavy_000/002/004 (CC0), pitch x0.55, 2.5kHz LP, cave reverb 0.5, peak -1dBFS (edited) — 기어가는 발소리
+
+# 7루프 끝 점프스케어 (Creature/Ending/jumpscare_creature.wav, EndingSceneDirector.Jumpscare) — 사용 중, 사용자가 후보 22개 중 직접 고름
+  [Pixabay Content License] "Bird-Creature Screams" by u_kse9ncnirq https://pixabay.com/sound-effects/horror-bird-creature-screams-399552/
+  앞 무음 0.27s 제거, 5ms fade-in, 2.65s부터 fade-out, 2.93s (소리 자체는 가공 안 함)
+# (미사용) 합성 괴성 (Creature/Ending/jumpscare_shriek.wav) — "장난감 소리" 판정
+  ElkBugle2 3.3~4.6s x1.3 (700Hz HP) + ElkBugle1 4.6~5.4s x1.45 (900Hz HP, +180Hz freq shift — 금속성) + ElkBugle1 3.5~4.6s x1.2 (vibrato 16Hz)
+  + 60ms white noise click (2.5kHz HP), short echo 25/55ms, 3ms attack, tanh soft clip, limiter, 1.05s (edited)
+# (미사용) 이전 점프스케어 포효 (Creature/Ending/jumpscare_roar.wav) — 낮은 들소 섞여 "늑대 울음 같다"로 교체됨
+  Bison914 1.85~3.6s x0.82 + ElkBugle2 3.45~5.2s x0.9 (250Hz HP) + ElkBugle1 5.3~6.3s x0.88 (300Hz HP)
+  short echo 35/70ms, 4ms attack, tanh soft clip, limiter 0.95, 1.8s (edited)
+
+# 엔딩 공격 레이어 (Ending/Layers/*.wav, EndingSceneDirector.Struggle/Tear/Eat) — 긴 녹음을 사건 단위로 자름
+  scream_1~4: female_high_pitched_scream_s__screams 에서 4개 / scream_weak_1~4: 같은 비명 + female_scream_1, x0.86~0.9, 1.1~1.3kHz LP, tremolo 9~11Hz (edited)
+  rip_1~10: ripping_into_meat 에서 10구간 / bonecrack_1~6: bsb__bones_cracking_1_0596 에서 6구간 (edited)
+
+# 폰트: Assets/Fonts/VT323-Regular.ttf — https://github.com/google/fonts/tree/main/ofl/vt323 (SIL OFL 1.1, VT323-OFL.txt)
+
+# 엔딩 친구 비명 (Ending/Layers/friend_scream_1~2.wav, EndingSceneDirector.Attack) — 사용자가 후보 23개(Ending/ScreamCandidates) 중 고름
+  [Pixabay Content License] friend_scream_1: "Sound Effect - Woman Scream" by ScottishPerson https://pixabay.com/sound-effects/people-sound-effect-woman-scream-236488/
+  friend_scream_2: "Scared Woman Scream" by Universfield https://pixabay.com/sound-effects/people-scared-woman-scream-191977/
+  앞 무음 제거(2번 0.18s), 5ms fade-in, 음량만 맞춤(limiter 0.9) (edited)
+# (미사용) Layers/scream_1~4, scream_weak_1~4 — "비현실적" 판정
+
+Flashlight/ (6루프 손전등 깜빡임)
+  buzz_1, buzz_2  <- Camcorder/electric_buzz__buzz.ogg 일부 구간
+  buzz_3, buzz_4  <- Camcorder/bsb__crackling_radio_0313.ogg 일부 구간
+  click_A, click_B <- Camcorder/10_clicks_and_switches click_9, click_5
+Heartbeat/Candidates/ beat_A_slow, beat_B_fast <- heartbeat_sounds slow_0 / fast_0 의 첫 박동, +12.7dB
+Heartbeat/Candidates/ beat_C_real_1~3 <- bsb__heart_beat_0218.ogg 의 0.00s / 2.68s / 3.63s 박동, 잡음 제거 + 피크 -1dB (현재 사용)
+# 5루프 괴물 "스윽" 발소리 (Creature/Loop5/Scuff/scuff_1~4.wav, MonsterReveal) — 2026-09-30
+  Footsteps/fantozzis_footsteps_grasssan__Fantozzi_SandL1/R2/L3/R1 에서: pitch x0.78, 90Hz HP, 2.6kHz LP, 90ms 페이드인(끌림), 짧은 동굴 잔향, -20 LUFS (edited)
+# 2026-09-30 수정: cry_1~2 = 위 결과를 x0.8로 낮춤(asetrate, 길이 12.9s) + LP 3k + 에코 180/410ms, -15 LUFS
+#                 growl_A = 1.6s부터 0.6s 동안 원본 → 700Hz 저역통과 버전으로 교차 (뒤쪽 엘크 고음 약 -18dB)
+# 2026-09-30 교체: 5루프 "스윽" (Creature/Loop5/Scuff/scuff_1~4.wav) — BigSoundBank #1117 gravel_2 의 1.05/4.75/5.95/8.45s 에서 0.8s,
+#   x0.85, 120Hz HP, 3.5k LP, 0.22s 부풀어 오르는 페이드인 + 0.39s 페이드아웃(바닥 쓸기), 잔향 70/140ms, -16 LUFS (edited)
+# 6루프 달리는 "스윽" (Creature/Loop6/run_scuff_1~4.wav, BlackoutSequence) — 같은 구간 0.5s, x0.9, atempo 1.25, 짧은 페이드, -16 LUFS (edited)
+# 6루프 먼 여자 비명 (Creature/Loop6/scream_far.wav) — Ending/Layers/friend_scream_2 (Pixabay, Universfield) 에 350Hz HP, 1.6k LP, 동굴 잔향 230/470/760ms, -22 LUFS (edited)
+# 6루프 개 달리는 소리 (Creature/Loop6/dog_run_1~4.wav, BlackoutSequence) — 2026-09-30, run_scuff 대체
+#   발바닥: different_steps_on_wood_ston__wood01~03 + kenney__footstep00/02 을 x1.35~1.6, 0.12s로 자름 / 발톱: 절차 생성한 짧은 공진 클릭(3.2~5.2kHz)
+#   두 마리 질주(gallop) 4박을 조립 (scratchpad dog_gallop.py), 잔향 45/110ms (edited)
+# 엔딩 공격 소리 재구성 (Ending/Attack/*.wav, EndingSceneDirector.attackCues) — 2026-09-30 "반복되는 게임 효과음 같다" 피드백
+#   bed_tearing: ripping_into_meat 12~21.5s 한 테이크 x0.9 + wet_squish_slurp 한 테이크 x0.85 / body_fall: kenney impactSoft_heavy + cloth
+#   crack_1~8: Wet_Break·Deep_Break·crunch·impactsplat 을 2~3개씩 겹친 덩어리, 피치 x0.75~0.95
+#   전부 "바닥에 떨어진 캠 마이크": 70Hz HP, 3.2k LP, 37/83/140ms 잔향 (edited)
+# 2026-09-30 교체: 엔딩 친구 비명 (Ending/Layers/friend_scream_1~2.wav) — "다른 비명으로" 요청
+#   [Pixabay Content License] "Multiple Female Screams" by freesound_community https://pixabay.com/sound-effects/people-multiple-female-screams-70786/
+#   friend_scream_1 = 18.2~20.4s, friend_scream_2 = 30.7~33.5s 에서 앞뒤 무음만 잘라냄, 5ms 페이드인 / 120ms 페이드아웃, 피크 0.9 (가공 없음)
+#   (6루프 scream_far 는 이전 friend_scream_2 로 만든 것 그대로)
+# 2026-09-30 교체: 6루프 달려 지나가는 발소리 (Creature/Loop6/Steps/step_1~5.wav) — dog_run/run_scuff 삭제 ("물소리·휘파람 같은 소리 없이 발소리만")
+#   Kenney footstep_concrete_000~004 (CC0) 그대로, 피크 0.89로 맞춤 + 4ms/15ms 페이드만. 잔향·피치·합성 없음
+# 2026-09-30 재교체: 엔딩 친구 비명 — "더 고통스러운 걸로". 위 Multiple Female Screams 대신
+#   [Pixabay Content License] "Cry of Pain" by DRAGON-STUDIO https://pixabay.com/sound-effects/horror-cry-of-pain-357978/ (ScreamCandidates/22)
+#   friend_scream_1 = 0.05~2.35s, friend_scream_2 = 2.75~6.45s, 5ms 페이드인 / 0.15·0.4s 페이드아웃, 피크 0.9 (가공 없음). 두 번째 비명 큐 2.0s → 2.5s
+# 2026-09-30: 6루프 발소리 step_1~5 에 tanh 소프트 새츄레이션(×2)으로 약 +6~7dB, stepSource MinDistance 6→14, endVolume 0.12→0.35
+#   6루프 먼 비명 scream_far.wav 삭제 ("마지막에 휘익 하는 휘파람 같은 소리 빼")
+# 2026-09-30 교체: 6루프 발소리 → 늑대 자갈 질주 (Creature/Loop6/Steps/wolf_gallop_1~5.wav, 이전 step_1~5 자리·GUID 그대로)
+#   BigSoundBank gravel_2 #1117, gravel_4 #3216, step_on_gravel #0085, feet_on_pebbles #0839 (CC0) 에서 발 디딤 앞 0.13s 만 잘라 x1.12,
+#   네 발 로터리 갤럽 한 보폭(0 / 0.055 / 0.15 / 0.205s)으로 배치, 90Hz HP, tanh 크기 올림. 합성음·잔향 없음 (scratchpad wolf_gallop.py)
+#   씬: stepInterval 0.40~0.44, stepLength 2.6 (약 6m/s)
+# 2026-09-30 변경: 6루프 늑대 발소리 갤럽 묶음 → 발 하나씩 (Creature/Loop6/Steps/wolf_paw_1~8.wav), 고른 8분음표 리듬
+#   같은 BigSoundBank 자갈 녹음에서 앞 30ms 에 에너지가 몰린 또렷한 디딤 8개, 0.13s x1.12, 90Hz HP, tanh 크기 올림 (scratchpad wolf_paws.py)
+#   씬: stepInterval 0.12 고정, stepLength 0.72 (약 6m/s), stepPitch 0.94~1.06
+# 2026-09-30 수정: wolf_paw_1~8 을 "한 번만 탓" 클립으로 다시 만듦 — 이전 것은 한 클립 안에 자갈 구르는 두 번째 소리가 섞여 있었음
+#   봉우리 하나로 떨어지기만 하는 디딤만 골라(봉우리 뒤 90ms 안에 재상승 < 6dB), 봉우리 뒤 16ms 시간상수로 감쇠, 길이 75ms (scratchpad wolf_paws_single.py)
+# 2026-09-30: wolf_paw_1~8 tanh 1.6 → 3.0 (평균 RMS -18.2 → -15.0 dB) — 네 발 질주로 바꾼 뒤 첫 발 이후가 거의 안 들린다는 피드백
+
+# 7루프 추격 (Creature/Loop7/*, Rocks/boulder_block.wav, ChaseSequence) — 2026-10-01
+#   chase_roar / chase_growl_1~5: 곰 같은 낮고 거친 울음 — NPS 들소 bellow를 x0.8 (asetrate) 로 낮춤, 55Hz HP + 3.2kHz LP, 짧은 동굴 에코, peak -1dBFS (edited)
+#     roar  = BisonRut 43.75s~ 2.95s / growl_1 = Bison918 23.0s~1.8s / growl_2 = Bison918 26.1s~1.9s
+#     growl_3 = Bison914 1.0s~1.95s / growl_4 = BisonRut 59.3s~2.7s / growl_5 = Bison918 6.1s~1.35s
+#   괴물 발소리 = Creature/Loop5/stomp_1~3 재사용 (Kenney impactSoft_heavy 가공본)
+#   boulder_block.wav: rumbling20 0~3.2s (fade) + cave_in_starninjas (+0.3s) + kenney impactSoft_heavy_001 x0.5 & impactMining_002 x0.6 (+2.05s = 돌이 떨어지는 '쿵'),
+#     40Hz HP + 4.5kHz LP, 동굴 에코, limiter -1dBFS (edited)

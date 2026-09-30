@@ -16,6 +16,11 @@ namespace CaveGame
         public void Interact(Vector3 point)
         {
             if (NoteViewer.Instance != null) NoteViewer.Instance.Open(content, font);
+            NoteLog.MarkRead(Id);
+            Debug.Log($"[메모] {Id} 읽음 — {NoteLog.ReadCount}장 ({string.Join(", ", NoteLog.ReadIds)}) / 루프 {GameManager.Instance?.CurrentLoop}");
         }
+
+        // 메모마다 이름이 다르다 (Note_L1, Note_V2 …) — 같은 메모를 여러 번 읽어도 한 번으로 친다
+        public string Id => name;
     }
 }

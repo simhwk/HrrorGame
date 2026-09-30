@@ -54,3 +54,14 @@ desktop.ini
 
 # Local backups/exports (too large for repo)
 *.zip
+
+# MCP 디버그 캡처 (에디터 도구 산출물)
+/[Aa]ssets/[Ss]creenshots/
+/[Aa]ssets/[Ss]creenshots.meta
+/[Cc]aptures/
+
+# 플레이어 빌드 결과물 (build/의 PPT 생성 스크립트만 추적)
+/build/*
+!/build/gen_ppt.js
+!/build/package.json
+!/build/package-lock.json

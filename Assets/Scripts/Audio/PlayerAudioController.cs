@@ -11,6 +11,9 @@ namespace CaveGame
         [SerializeField, Range(0f, 1f)] float stepVolume = 0.6f;
         [SerializeField] float stepInterval = 0.55f;
         [SerializeField] float crouchStepInterval = 0.75f;
+        [Tooltip("달릴 때 발소리 음량 / 음높이 — 간격은 PlayerController.RunStepInterval")]
+        [SerializeField, Range(0f, 1f)] float runStepVolume = 0.85f;
+        [SerializeField] Vector2 runStepPitch = new Vector2(0.95f, 1.15f);
         [SerializeField] int offBeatFromLoop = 3;
         [SerializeField] float offBeatAmount = 0.12f;
 
@@ -18,6 +21,9 @@ namespace CaveGame
         [SerializeField] AudioClip[] breathingByLoop = new AudioClip[7];
         [SerializeField, Range(0f, 1f)] float breathingVolume = 0.4f;
         [SerializeField] float breathingFadeTime = 2f;
+        [Tooltip("달릴 때 숨 — 루프 숨 대신 헐떡임으로 바뀐다")]
+        [SerializeField] AudioClip runBreathing;
+        [SerializeField, Range(0f, 1f)] float runBreathingVolume = 0.65f;
 
         [Header("Crouch")]
         [SerializeField] AudioClip[] crouchClips;
@@ -84,6 +90,12 @@ namespace CaveGame
 
             PlayStep();
 
+            if (Running)
+            {
+                // 달리기는 박자가 거의 일정하다 — 흐트러진 걸음(offBeat)은 겁먹고 더듬을 때의 리듬
+                stepTimer = player.RunStepInterval * Random.Range(0.95f, 1.05f);
+                return;
+            }
             float interval = player.IsCrouched ? crouchStepInterval : stepInterval;
             if (CurrentLoop >= offBeatFromLoop)
                 interval += Random.Range(-offBeatAmount, offBeatAmount);
@@ -91,6 +103,7 @@ namespace CaveGame
         }
 
         bool Crawling => player.IsCrouched && crawlContacts.Length > 0;
+        bool Running => player.IsRunning && !player.IsCrouched;
 
         void PlayStep()
         {
@@ -100,8 +113,9 @@ namespace CaveGame
                 return;
             }
             if (steps.Length == 0) return;
-            stepSource.pitch = Random.Range(0.9f, 1.1f);
-            stepSource.PlayOneShot(steps[stepIndex], stepVolume);
+            bool run = Running;
+            stepSource.pitch = run ? Random.Range(runStepPitch.x, runStepPitch.y) : Random.Range(0.9f, 1.1f);
+            stepSource.PlayOneShot(steps[stepIndex], run ? runStepVolume : stepVolume);
             stepIndex = (stepIndex + 1) % steps.Length;
         }
 
@@ -139,7 +153,11 @@ namespace CaveGame
         {
             int index = Mathf.Clamp(CurrentLoop - 1, 0, breathingByLoop.Length - 1);
             AudioClip target = breathingByLoop.Length > 0 ? breathingByLoop[index] : null;
-            float fadeStep = Time.deltaTime * breathingVolume / breathingFadeTime;
+            bool run = player.IsRunning && runBreathing != null;
+            if (run) target = runBreathing;
+            float volume = run ? runBreathingVolume : breathingVolume;
+            // 달리기 시작하면 숨이 곧바로 바뀌어야 한다 — 평소 페이드(2초)는 너무 느리다
+            float fadeStep = Time.deltaTime * volume / (run ? breathingFadeTime * 0.2f : breathingFadeTime);
 
             if (breathSource.clip != target)
             {
@@ -157,7 +175,7 @@ namespace CaveGame
             {
                 // 숨 죽이기는 페이드보다 빨라야 한다 — 소리를 들은 순간 멎는 느낌
                 float step = BreathDuck < 1f ? fadeStep * 6f : fadeStep;
-                breathSource.volume = Mathf.MoveTowards(breathSource.volume, breathingVolume * BreathDuck, step);
+                breathSource.volume = Mathf.MoveTowards(breathSource.volume, volume * BreathDuck, step);
             }
         }
 

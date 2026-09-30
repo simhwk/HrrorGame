@@ -22,7 +22,7 @@ namespace CaveGame
         [SerializeField] float triggerRadius = 2f;
 
         [Header("기척 — 나아갈 때마다 한 번씩, 점점 가깝게")]
-        [Tooltip("귀에서 이 직선거리(m)에서 난다. 개수 = 최대 횟수")]
+        [Tooltip("귀에서 이 직선거리(m)에서 난다. 개수 = 게임 전체의 최대 횟수 (루프를 다시 와도 늘지 않는다)")]
         [SerializeField] float[] beatDistances = { 7f, 5f, 3.5f, 2f };
         [Tooltip("정뒤에서 좌우로 이만큼(도) 비껴 난다 — 매번 이 범위에서 무작위, 좌우는 번갈아")]
         [SerializeField] Vector2 rearAngle = new Vector2(35f, 50f);
@@ -80,10 +80,10 @@ namespace CaveGame
         protected override void OnLoopChanged(int current)
         {
             source.Stop();
-            beat = 0;
             gaspAt = -1f;
             lastPos = player.transform.position;
-            state = current == loop ? State.Waiting : State.Done;
+            // 횟수(beat)는 게임 전체에서 센다 — 4루프를 다시 지나도 이미 운 만큼은 다시 울지 않는다
+            state = current == loop && beat < beatDistances.Length ? State.Waiting : State.Done;
         }
 
         protected override void OnDisable()

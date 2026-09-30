@@ -59,9 +59,10 @@ namespace CaveGame
 
         // seconds 동안 이 루프의 세기(× scale)로 뛴다. 겹쳐 부르면 더 센 쪽·더 긴 쪽을 따른다.
         // 매 프레임 불러도 된다 (예: 괴물이 보이는 동안 계속).
+        // scale > 1은 루프 상한을 넘겨 끝까지(세기 1) 몰아붙일 때만 — 7루프 추격에서 괴물이 바로 뒤에 붙었을 때
         public void Raise(float seconds, float scale = 1f)
         {
-            float t = loopStrength * Mathf.Clamp01(scale);
+            float t = Mathf.Clamp01(loopStrength * Mathf.Max(0f, scale));
             if (Time.time >= holdUntil || t > target) target = t;
             holdUntil = Mathf.Max(holdUntil, Time.time + seconds);
         }

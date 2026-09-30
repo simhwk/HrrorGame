@@ -25,6 +25,16 @@ namespace CaveGame
         [SerializeField] LayerMask ceilingMask = ~0;
 
         [SerializeField] float moveSpeed = 1.8f;
+
+        [Header("달리기 — 7루프 추격 때만 연출이 켠다 (플레이어가 켤 수 없다)")]
+        [Tooltip("달리기 = 걷기 속도 × 이 값")]
+        [SerializeField] float runSpeedMultiplier = 2f;
+        [Tooltip("달릴 때 한 걸음 시간 (초) — 발소리와 머리 흔들림이 이 박자를 같이 쓴다")]
+        [SerializeField] float runStepInterval = 0.3f;
+        [Tooltip("달릴 때 발 디딜 때마다 눈높이가 내려가는 양 (m) — 카메라 연출을 바꾸지 않을 만큼 작게")]
+        [SerializeField] float runBobAmount = 0.035f;
+        [Tooltip("걷기 ↔ 달리기 전환 시간 (초) — 괴물을 본 순간 바로 튀어 나가게 짧게")]
+        [SerializeField] float runBlendTime = 0.1f;
         [SerializeField] float mouseSensitivity = 0.12f;
         [SerializeField] float gravity = -9.81f;
         [SerializeField] float heightBlendSpeed = 8f;
@@ -56,12 +66,20 @@ namespace CaveGame
         const float EyeProbeRadius = 0.1f;
         bool heldCrouch; // 루프 시작 시 웅크린 채로 시작 — 웅크리기 키를 눌렀다 떼면 풀린다
         Vector2 lastLookDelta;
+        bool running;
+        float runBlend, runBobPhase;
         public Transform CameraPivot => cameraPivot;
         public bool IsCrouched => ceilingCrouch || heldCrouch || (crouchAction != null && crouchAction.IsPressed());
         public bool InteractPressed => interactAction != null && interactAction.WasPressedThisFrame();
         public Vector2 LastLookDelta => lastLookDelta;
-        public Vector2 MoveInput => moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
+        // 연출이 걷기만 막을 때 (시점은 그대로 움직인다) — 발소리·흔들림도 이 값을 읽으므로 같이 멈춘다
+        public bool MovementLocked { get; set; }
+        public Vector2 MoveInput => moveAction != null && !MovementLocked ? moveAction.ReadValue<Vector2>() : Vector2.zero;
         public bool IsGrounded => controller != null && controller.isGrounded;
+        public bool IsRunning => running;
+        // 0 = 걷기, 1 = 달리기 — 속도·흔들림이 서서히 바뀌게 여러 곳이 같은 값을 읽는다
+        public float RunBlend => runBlend;
+        public float RunStepInterval => runStepInterval;
 
         void Awake()
         {
@@ -83,6 +101,7 @@ namespace CaveGame
         void Update()
         {
             if (heldCrouch && crouchAction != null && crouchAction.WasReleasedThisFrame()) heldCrouch = false;
+            runBlend = Mathf.MoveTowards(runBlend, running ? 1f : 0f, Time.deltaTime / Mathf.Max(runBlendTime, 0.01f));
             HandleLook();
             UpdateCeilingCrouch();
             HandleHeight();
@@ -91,7 +110,7 @@ namespace CaveGame
 
         void HandleLook()
         {
-            Vector2 delta = lookAction.ReadValue<Vector2>() * mouseSensitivity;
+            Vector2 delta = lookAction.ReadValue<Vector2>() * (mouseSensitivity * GameSettings.SensitivityMultiplier);
             lastLookDelta = delta;
 
             transform.Rotate(Vector3.up * delta.x);
@@ -119,7 +138,7 @@ namespace CaveGame
             controller.height = Mathf.Lerp(controller.height, targetHeight, Time.deltaTime * blendSpeed);
             controller.center = new Vector3(0f, controller.height * 0.5f, 0f);
 
-            float eyeHeight = ClampEyeBelowCeiling(controller.height - eyeHeadroom);
+            float eyeHeight = ClampEyeBelowCeiling(controller.height - eyeHeadroom - RunBob());
             cameraPivot.localPosition = new Vector3(0f, eyeHeight, 0f);
 
             if (handPivot != null)
@@ -167,12 +186,23 @@ namespace CaveGame
             return controller.radius + nearest + probe;
         }
 
+        // 달릴 때만: 발을 디딜 때마다 살짝 내려앉는다 (한 걸음 = 반 주기). 멈추면 제자리로 돌아온다
+        float RunBob()
+        {
+            bool moving = MoveInput.sqrMagnitude > 0.01f && IsGrounded;
+            if (runBlend > 0f && moving)
+                runBobPhase = (runBobPhase + Time.deltaTime * Mathf.PI / runStepInterval) % (Mathf.PI * 2f);
+            else // 가장 가까운 선 자세(sin = 0)로 돌아간다
+                runBobPhase = Mathf.MoveTowards(runBobPhase, Mathf.Round(runBobPhase / Mathf.PI) * Mathf.PI, Time.deltaTime * 6f);
+            return Mathf.Abs(Mathf.Sin(runBobPhase)) * runBobAmount * runBlend;
+        }
+
         float CrouchBlend() => Mathf.Clamp01(Mathf.InverseLerp(standingHeight, crouchedHeight, controller.height));
 
         void HandleMove()
         {
-            Vector2 input = moveAction.ReadValue<Vector2>();
-            Vector3 move = (transform.right * input.x + transform.forward * input.y) * moveSpeed;
+            Vector2 input = MoveInput;
+            Vector3 move = (transform.right * input.x + transform.forward * input.y) * Mathf.Lerp(moveSpeed, moveSpeed * runSpeedMultiplier, runBlend);
 
             if (controller.isGrounded && verticalVelocity < 0f)
                 verticalVelocity = -1f;
@@ -185,5 +215,12 @@ namespace CaveGame
         public void SetCeilingAutoCrouch(bool enabled) => ceilingAutoCrouch = enabled;
 
         public void HoldCrouchUntilRelease() => heldCrouch = true;
+
+        // 추격이 시작되면 달린다 — 웅크리고 있었어도 벌떡 일어나 뛰게 한다 (천장이 낮으면 자동 웅크림은 그대로)
+        public void SetRunning(bool on)
+        {
+            running = on;
+            if (on) heldCrouch = false;
+        }
     }
 }

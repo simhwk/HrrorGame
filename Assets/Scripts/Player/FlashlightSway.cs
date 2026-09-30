@@ -17,6 +17,9 @@ namespace CaveGame
         [SerializeField] float bobPosAmount = 0.015f;
         [SerializeField] float bobRotAmount = 2.2f;
         [SerializeField] float moveInputThreshold = 0.1f;
+        [Tooltip("달릴 때 흔들림 빠르기 / 크기 배율 (PlayerController.RunBlend로 서서히 바뀐다)")]
+        [SerializeField] float runFrequencyScale = 1.8f;
+        [SerializeField] float runAmountScale = 2.2f;
 
         [Header("정지 시 손떨림 (Perlin Noise 기반 미세 지터)")]
         [SerializeField] float idleJitterAmount = 0.06f;
@@ -51,8 +54,12 @@ namespace CaveGame
             targetSway = Vector2.ClampMagnitude(targetSway, maxLookSway);
             currentLookSway = Vector2.Lerp(currentLookSway, targetSway, Time.deltaTime * lookSwaySmooth);
 
+            float run = playerController != null ? playerController.RunBlend : 0f;
+            float frequency = bobFrequency * Mathf.Lerp(1f, runFrequencyScale, run);
+            float posAmount = bobPosAmount * Mathf.Lerp(1f, runAmountScale, run);
+            float rotAmount = bobRotAmount * Mathf.Lerp(1f, runAmountScale, run);
             if (isMoving)
-                bobTimer += Time.deltaTime * bobFrequency * Mathf.PI * 2f;
+                bobTimer += Time.deltaTime * frequency * Mathf.PI * 2f;
 
             Vector3 bobPos = Vector3.zero;
             Vector3 bobRot = Vector3.zero;
@@ -60,8 +67,8 @@ namespace CaveGame
             {
                 float bobSin = Mathf.Sin(bobTimer);
                 float bobCos = Mathf.Cos(bobTimer * 0.5f);
-                bobPos = new Vector3(bobCos * bobPosAmount, Mathf.Abs(bobSin) * bobPosAmount, 0f);
-                bobRot = new Vector3(bobSin * bobRotAmount * 0.5f, 0f, bobCos * bobRotAmount);
+                bobPos = new Vector3(bobCos * posAmount, Mathf.Abs(bobSin) * posAmount, 0f);
+                bobRot = new Vector3(bobSin * rotAmount * 0.5f, 0f, bobCos * rotAmount);
             }
 
             float jitterX = (Mathf.PerlinNoise(noiseSeedX, Time.time * idleJitterSpeed) - 0.5f) * 2f;

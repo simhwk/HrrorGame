@@ -91,6 +91,9 @@ namespace CaveGame
             }
         }
 
+        // 다른 연출이 부르는 한 번의 끊김 (루프 범위와 무관) — 예: 6루프 손전등이 꺼지는 순간
+        public void Burst(float length) => StartBurst(Time.time, length);
+
         void StartBurst(float now, float length)
         {
             burstEnd = now + length;

@@ -10,6 +10,7 @@ namespace CaveGame
     public class NoteViewer : MonoBehaviour
     {
         public static NoteViewer Instance { get; private set; }
+        public bool IsOpen => panel.activeSelf;
 
         [SerializeField] GameObject panel;
         [SerializeField] TMP_Text text;
